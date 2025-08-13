@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -336,17 +335,5 @@
             e.target.value = formatted;
         });
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"96e734513b2df9ba","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.7.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
 </body>
 </html>
-    <script id="html_badge_script1">
-        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDne774bBVEl4f6pmLZMzIvG8LBUAijQtn1a8USDLF5klVwzOfciBjWozpNUHuedIlPCVwmQpI76r2lrpl%2Fkdk1qO9bCWijx4wMvmar9%2FVigKiaA36A5KYaaxRC1oJ8KIUrMhELj7G0aRCHfV5Hu5mSeg18%2BUCRzZ7KHBuumhXThfeTnOa4Ke7GLw8gIjSty8ivizkjXWWzFQOGFhj5D9npbJJith1IPIjlabHI93t1Lc2MGRr9EKdHMqBfC3c%2B%2BpgXN2nxt7Juyk01fpGYKe58fYO2ltQaIeUvIx0RkF%2FD6xHrHcQJOBY5fuvrb3h%2Fnpi2kXc3vB6ELppnNuI08eGhu00UFVw6TOsf80t8f%2BX0LX%2BE3CheVAoHupuUpcO%2Bq8hQdKp8%2BGnAdtUqtsVOapAeEON4CDbRlxHoDhg6FMmp3uJrqGfGyWMrs3zfO7SiXmFnM2GGRyMKQW1qwnZszG9l0OwXhRSNR3eCfWiDRrM7shYfJJrLoTi0HwWHz6%2BKv67Q%3D%3D";
-        window.__genspark_locale = "en-US";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDne774bBVEl4f6pmLZMzIvG8LBUAijQtn1a8USDLF5klVwzOfciBjWozpNUHuedIlPCVwmQpI76r2lrpl/kdk1qO9bCWijx4wMvmar9/VigKiaA36A5KYaaxRC1oJ8KIUrMhELj7G0aRCHfV5Hu5mSeg18+UCRzZ7KHBuumhXThfeTnOa4Ke7GLw8gIjSty8ivizkjXWWzFQOGFhj5D9npbJJith1IPIjlabHI93t1Lc2MGRr9EKdHMqBfC3c++pgXN2nxt7Juyk01fpGYKe58fYO2ltQaIeUvIx0RkF/D6xHrHcQJOBY5fuvrb3h/npi2kXc3vB6ELppnNuI08eGhu00UFVw6TOsf80t8f+X0LX+E3CheVAoHupuUpcO+q8hQdKp8+GnAdtUqtsVOapAeEON4CDbRlxHoDhg6FMmp3uJrqGfGyWMrs3zfO7SiXmFnM2GGRyMKQW1qwnZszG9l0OwXhRSNR3eCfWiDRrM7shYfJJrLoTi0HwWHz6+Kv67Q==";
-    </script>
-    
-        <script id="html_badge_script2" src="https://www.genspark.ai/html_badge.js"></script>
-        
-    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
-    
