@@ -142,18 +142,16 @@
                     </label>
                     <input type="tel" id="phone" name="phone" required 
                            class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
-                           placeholder="+7 (___) ___-__-__">
+                           placeholder="+375 (__) ___-__-__">
                 </div>
                 
-                <div class="flex items-start space-x-3 mt-6">
-                    <div class="checkbox-custom">
-                        <input type="checkbox" id="consent" name="consent" required>
-                        <span class="checkmark"></span>
-                    </div>
-                    <label for="consent" class="text-sm text-gray-600 cursor-pointer leading-5">
-                        Я соглашаюсь на обработку персональных данных и получение информационных сообщений *
+                                <div class="flex items-start space-x-3 mt-6">
+                    <input type="checkbox" id="dataProcessing" required class="checkbox-custom mt-1">
+                    <label for="dataProcessing" class="text-sm text-gray-700 cursor-pointer">
+                        Я согласен на обработку персональных данных и участие в лотерее *
                     </label>
                 </div>
+
                 
                 <button type="submit" 
                         class="w-full red-gradient text-white py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-105">
