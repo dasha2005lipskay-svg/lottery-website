@@ -1,32 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Форма сбора данных и лотерея</title>
+    <title>Лотерея с рандомайзером слов</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
-        }
-        
         .modal-overlay {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-        
-        .lottery-container {
-            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        .word-display {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: white;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.7);
         }
         
         .spin-animation {
@@ -34,9 +17,38 @@
         }
         
         @keyframes spin {
-            0% { transform: rotateY(0deg) scale(1); }
-            50% { transform: rotateY(180deg) scale(1.1); }
-            100% { transform: rotateY(360deg) scale(1); }
+            0% { transform: rotateY(0deg); opacity: 1; }
+            50% { transform: rotateY(90deg); opacity: 0.3; }
+            100% { transform: rotateY(0deg); opacity: 1; }
+        }
+        
+        .word-display {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pulse-button {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+        }
+        
+        .red-gradient {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        }
+        
+        .form-input {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
         }
         
         .form-input:focus {
@@ -44,296 +56,375 @@
             box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #dc2626;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .checkbox-custom input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .checkbox-custom input[type="checkbox"]:checked + .checkmark {
+            background-color: #dc2626;
+        }
+        
+        .checkbox-custom input[type="checkbox"]:checked + .checkmark:after {
+            display: block;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
             transition: all 0.3s ease;
         }
         
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
-        }
-        
-        .checkbox-custom {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #6b7280;
-            border-radius: 4px;
-            background-color: white;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .checkbox-custom:checked {
-            background-color: #dc2626;
-            border-color: #dc2626;
-        }
-        
-        .checkbox-custom:checked::after {
-            content: '✓';
+        .checkmark:after {
+            content: "";
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
-    
-    <!-- Модальное окно с формой -->
-    <div id="formModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Регистрация участника</h2>
-                <p class="text-gray-600">Заполните форму для участия в лотерее</p>
+<body class="gradient-bg min-h-screen">
+    <!-- Модальное окно для сбора данных -->
+    <div id="dataModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div class="red-gradient text-white p-6 rounded-t-lg">
+                <h2 class="text-2xl font-bold text-center">
+                    <i class="fas fa-gift mr-2"></i>
+                    Участие в лотерее
+                </h2>
+                <p class="text-center mt-2 opacity-90">Заполните данные для участия</p>
             </div>
             
-            <form id="registrationForm" class="space-y-4">
+            <form id="userDataForm" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">ФИО *</label>
-                    <input type="text" id="fullName" required 
-                           class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition-all"
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-user mr-2 text-red-600"></i>ФИО *
+                    </label>
+                    <input type="text" id="fullName" name="fullName" required 
+                           class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
                            placeholder="Введите ваше полное имя">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input type="email" id="email" required 
-                           class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition-all"
-                           placeholder="example@email.com">
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-envelope mr-2 text-red-600"></i>Email *
+                    </label>
+                    <input type="email" id="email" name="email" required 
+                           class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
+                           placeholder="your@email.com">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Номер телефона *</label>
-                    <input type="tel" id="phone" required 
-                           class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition-all"
-                           placeholder="+7 (999) 123-45-67">
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-phone mr-2 text-red-600"></i>Номер телефона *
+                    </label>
+                    <input type="tel" id="phone" name="phone" required 
+                           class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
+                           placeholder="+7 (___) ___-__-__">
                 </div>
                 
                 <div class="flex items-start space-x-3 mt-6">
-                    <input type="checkbox" id="dataProcessing" required class="checkbox-custom mt-1">
-                    <label for="dataProcessing" class="text-sm text-gray-700 cursor-pointer">
-                        Я согласен на обработку персональных данных и участие в лотерее *
+                    <div class="checkbox-custom">
+                        <input type="checkbox" id="consent" name="consent" required>
+                        <span class="checkmark"></span>
+                    </div>
+                    <label for="consent" class="text-sm text-gray-600 cursor-pointer leading-5">
+                        Я соглашаюсь на обработку персональных данных и получение информационных сообщений *
                     </label>
                 </div>
                 
-                <button type="submit" class="btn-primary w-full py-3 px-6 text-white rounded-lg font-semibold">
+                <button type="submit" 
+                        class="w-full red-gradient text-white py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300 hover:shadow-lg transform hover:scale-105">
                     <i class="fas fa-paper-plane mr-2"></i>
-                    Зарегистрироваться
+                    Участвовать в лотерее
                 </button>
             </form>
         </div>
     </div>
-    
-    <!-- Страница лотереи -->
-    <div id="lotteryPage" class="hidden w-full max-w-2xl mx-4">
-        <div class="lottery-container rounded-2xl p-8 text-center">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">🎲 Лотерея слов</h1>
-            <p class="text-gray-600 mb-8">Нажмите кнопку и узнайте ваше выигрышное слово!</p>
-            
-            <div class="mb-8">
-                <div id="wordDisplay" class="word-display text-6xl font-bold py-12 px-8 rounded-xl mb-6 min-h-32 flex items-center justify-center">
-                    ?
+
+    <!-- Основная страница с рандомайзером -->
+    <div id="mainContent" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="red-gradient text-white p-8 text-center">
+                    <h1 class="text-4xl font-bold mb-2">
+                        <i class="fas fa-dice mr-3"></i>Лотерея слов
+                    </h1>
+                    <p class="text-xl opacity-90">Нажмите кнопку и узнайте ваше слово!</p>
                 </div>
                 
-                <button id="lotteryBtn" class="btn-primary py-4 px-8 text-xl font-semibold text-white rounded-xl">
-                    <i class="fas fa-dice mr-2"></i>
-                    Участвовать в лотерее
-                </button>
-            </div>
-            
-            <div class="bg-gray-100 rounded-lg p-4">
-                <h3 class="text-lg font-semibold text-gray-700 mb-2">Возможные призы:</h3>
-                <div class="flex flex-wrap justify-center gap-2">
-                    <span class="bg-white px-3 py-1 rounded-full text-sm text-gray-600">🍵 кружка</span>
-                    <span class="bg-white px-3 py-1 rounded-full text-sm text-gray-600">🍽️ тарелка</span>
-                    <span class="bg-white px-3 py-1 rounded-full text-sm text-gray-600">🥤 стакан</span>
-                    <span class="bg-white px-3 py-1 rounded-full text-sm text-gray-600">🥓 сало</span>
-                    <span class="bg-white px-3 py-1 rounded-full text-sm text-gray-600">🥩 мясо</span>
+                <div class="p-8">
+                    <div class="word-display bg-gray-100 rounded-xl mb-8 border-4 border-gray-300">
+                        <div id="wordResult" class="text-6xl font-bold text-gray-800 text-center">
+                            ?
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button id="randomizeBtn" 
+                                class="pulse-button red-gradient text-white py-4 px-8 rounded-full font-bold text-xl transition-all duration-300 hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-magic mr-3"></i>
+                            <span id="btnText">Участвовать в лотерее</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-gray-600 mb-4">Возможные слова:</p>
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">кружка</span>
+                            <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">тарелка</span>
+                            <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">стакан</span>
+                            <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">сало</span>
+                            <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">мясо</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Google Apps Script URL для отправки данных
-        // ВАЖНО: Замените на ваш реальный URL после настройки Google Apps Script
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-        
-        // Список слов для лотереи
+        // Список слов для рандомайзера
         const words = ['кружка', 'тарелка', 'стакан', 'сало', 'мясо'];
         
-        // Эмодзи для слов
-        const wordEmojis = {
-            'кружка': '🍵',
-            'тарелка': '🍽️',
-            'стакан': '🥤',
-            'сало': '🥓',
-            'мясо': '🥩'
-        };
+        // URL Google Apps Script Web App (нужно будет заменить на реальный)
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
         
         // Элементы DOM
-        const formModal = document.getElementById('formModal');
-        const lotteryPage = document.getElementById('lotteryPage');
-        const registrationForm = document.getElementById('registrationForm');
-        const wordDisplay = document.getElementById('wordDisplay');
-        const lotteryBtn = document.getElementById('lotteryBtn');
+        const dataModal = document.getElementById('dataModal');
+        const mainContent = document.getElementById('mainContent');
+        const userDataForm = document.getElementById('userDataForm');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const wordResult = document.getElementById('wordResult');
+        const btnText = document.getElementById('btnText');
         
         // Показать модальное окно при загрузке страницы
         window.addEventListener('load', () => {
-            formModal.classList.remove('hidden');
+            dataModal.classList.add('animate-fadeIn');
         });
         
         // Обработка отправки формы
-        registrationForm.addEventListener('submit', async (e) => {
+        userDataForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
+            const formData = new FormData(userDataForm);
+            const userData = {
+                fullName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                consent: formData.get('consent'),
                 timestamp: new Date().toLocaleString('ru-RU')
             };
             
             // Показать загрузку
-            const submitBtn = registrationForm.querySelector('button[type="submit"]');
+            const submitBtn = userDataForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Отправка...';
             submitBtn.disabled = true;
             
             try {
-                // Отправка данных в Google Таблицы
-                await sendToGoogleSheets(formData);
+                // Отправка данных в Google Sheets
+                await sendToGoogleSheets(userData);
                 
-                // Скрыть форму и показать лотерею
-                formModal.classList.add('hidden');
-                lotteryPage.classList.remove('hidden');
-                
-                // Показать уведомление об успешной регистрации
-                showNotification('Регистрация успешна! Теперь участвуйте в лотерее!', 'success');
+                // Скрыть модальное окно и показать рандомайзер
+                dataModal.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('animate-fadeIn');
                 
             } catch (error) {
                 console.error('Ошибка отправки данных:', error);
-                showNotification('Ошибка регистрации. Попробуйте еще раз.', 'error');
-                
-                // Восстановить кнопку
+                alert('Произошла ошибка при отправке данных. Попробуйте еще раз.');
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
         });
         
-        // Функция отправки данных в Google Таблицы
-        async function sendToGoogleSheets(data) {
-            // Если у вас еще нет настроенного Google Apps Script, 
-            // эта функция будет имитировать отправку
-            
+        // Функция отправки данных в Google Sheets
+        async function sendToGoogleSheets(userData) {
+            // Здесь должна быть реальная отправка в Google Sheets
+            // Для демонстрации используем имитацию задержки
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    console.log('Данные для отправки в Google Таблицы:', data);
-                    
-                    // Здесь должен быть реальный запрос к Google Apps Script:
-                    /*
-                    fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(result => resolve(result))
-                    .catch(error => reject(error));
-                    */
-                    
-                    resolve({ success: true });
+                    console.log('Данные отправлены:', userData);
+                    resolve();
                 }, 1000);
             });
+            
+            /* 
+            Для реальной интеграции с Google Sheets нужно:
+            1. Создать Google Apps Script с функцией doPost
+            2. Опубликовать как Web App
+            3. Заменить URL выше на реальный
+            4. Раскомментировать код ниже:
+            
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            if (!response.ok) {
+                throw new Error('Ошибка отправки данных');
+            }
+            */
         }
         
-        // Обработка лотереи
-        lotteryBtn.addEventListener('click', () => {
-            // Анимация вращения
-            wordDisplay.classList.add('spin-animation');
-            lotteryBtn.disabled = true;
-            lotteryBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Крутим...';
+        // Рандомайзер слов
+        randomizeBtn.addEventListener('click', () => {
+            if (randomizeBtn.disabled) return;
             
-            setTimeout(() => {
-                // Выбор случайного слова
-                const randomWord = words[Math.floor(Math.random() * words.length)];
-                const emoji = wordEmojis[randomWord];
+            randomizeBtn.disabled = true;
+            btnText.textContent = 'Выбираем...';
+            
+            // Анимация рандомизации
+            let iterations = 0;
+            const maxIterations = 15;
+            
+            const animationInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * words.length);
+                wordResult.textContent = words[randomIndex];
+                wordResult.classList.add('spin-animation');
                 
-                // Показать результат
-                wordDisplay.innerHTML = `${emoji}<br>${randomWord}`;
-                wordDisplay.classList.remove('spin-animation');
+                setTimeout(() => {
+                    wordResult.classList.remove('spin-animation');
+                }, 100);
                 
-                // Восстановить кнопку
-                lotteryBtn.disabled = false;
-                lotteryBtn.innerHTML = '<i class="fas fa-dice mr-2"></i>Попробовать еще раз';
+                iterations++;
                 
-                // Показать поздравление
-                showNotification(`Поздравляем! Ваш приз: ${randomWord} ${emoji}`, 'success');
-                
-            }, 1000);
+                if (iterations >= maxIterations) {
+                    clearInterval(animationInterval);
+                    
+                    // Финальный выбор
+                    setTimeout(() => {
+                        const finalIndex = Math.floor(Math.random() * words.length);
+                        wordResult.textContent = words[finalIndex];
+                        wordResult.classList.add('spin-animation');
+                        
+                        // Показать результат с конфетти эффектом
+                        setTimeout(() => {
+                            wordResult.classList.remove('spin-animation');
+                            wordResult.classList.add('text-red-600');
+                            btnText.textContent = 'Попробовать еще раз';
+                            randomizeBtn.disabled = false;
+                            
+                            // Простой эффект празднования
+                            confettiEffect();
+                        }, 500);
+                    }, 500);
+                }
+            }, 150);
         });
         
-        // Функция показа уведомлений
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white font-semibold z-50 transform transition-all duration-300 ${
-                type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-            }`;
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>
-                    ${message}
-                </div>
-            `;
+        // Простой эффект конфетти
+        function confettiEffect() {
+            const colors = ['#dc2626', '#ef4444', '#f87171', '#fca5a5'];
+            const confettiCount = 50;
             
-            document.body.appendChild(notification);
-            
-            // Показать уведомление
-            setTimeout(() => notification.classList.add('translate-x-0'), 100);
-            
-            // Скрыть через 3 секунды
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => document.body.removeChild(notification), 300);
-            }, 3000);
+            for (let i = 0; i < confettiCount; i++) {
+                createConfetti(colors[Math.floor(Math.random() * colors.length)]);
+            }
         }
         
-        // Валидация телефона в реальном времени
+        function createConfetti(color) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = color;
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '1000';
+            confetti.style.borderRadius = '50%';
+            
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { transform: 'translateY(-10px) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 2000 + 2000,
+                easing: 'ease-out'
+            });
+            
+            animation.onfinish = () => {
+                confetti.remove();
+            };
+        }
+        
+        // Форматирование номера телефона
         document.getElementById('phone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                if (value[0] !== '7' && value[0] !== '8') {
-                    value = '7' + value;
+            if (value.startsWith('8')) value = '7' + value.slice(1);
+            if (value.startsWith('7')) {
+                value = value.slice(0, 11);
+                const formatted = value.replace(/^7(\d{3})(\d{3})(\d{2})(\d{2})$/, '+7 ($1) $2-$3-$4');
+                if (formatted.includes('(') && formatted.includes(')')) {
+                    e.target.value = formatted;
+                } else {
+                    e.target.value = '+7 ' + value.slice(1);
                 }
-                if (value[0] === '8') {
-                    value = '7' + value.slice(1);
-                }
+            } else {
+                e.target.value = '+7 ' + value;
             }
-            
-            let formatted = value;
-            if (value.length > 1) {
-                formatted = '+7 (' + value.slice(1, 4);
-            }
-            if (value.length >= 5) {
-                formatted += ') ' + value.slice(4, 7);
-            }
-            if (value.length >= 8) {
-                formatted += '-' + value.slice(7, 9);
-            }
-            if (value.length >= 10) {
-                formatted += '-' + value.slice(9, 11);
-            }
-            
-            e.target.value = formatted;
         });
+        
+        // CSS анимации через JavaScript
+        const style = document.createElement('style');
+        style.textContent = `
+            .animate-fadeIn {
+                animation: fadeIn 0.5s ease-out;
+            }
+            
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDqk2OlqNTxyXBpmoRKdrbmixINH3aoFKdP%2FHc5zi46Wpq3CicexYHziOYOnyRodwMM3Zw3UHM1MbocQk6%2BFuvb%2FiJC%2FZrCO0iBrfIDqUJMWAJcevl%2FsmusgxUh%2Fl0ckU5a47Mawmb%2BibN%2FWwQD1ze4B9ufVE7fVKdLlf6Y5igp2P2HsGh2oitKX1mTqd4Luoub4NscQbTD%2F8B2ogP%2B1TmBNK9emIvJ2PRKFXwARBu1%2BfUcofBMBNYuXdpF6h6vsXi%2Bm90a3NbP6sttgsGceDuZkNfn7sdK0oRKlPO2J9IKw6RIISHjAT3SddxeOMqhClbjlKZfoD0%2B9u7b%2FylcLcNUrxpPbj6otciNahcgrlMKtSXCdqJE40QE%2Fb%2BEMVepUChDDVc4IBA8nZ66%2Be%2FcBCyHsDGIpZBkdhwmd0%2FKCQoP%2F%2F%2F3ABcQV4VRcDts6FPcinZ%2BDL2QoleFxkX2jZ%2Bb6%2FRaxr4qCiTNrCJJ0Wqsgv2sqxyKROpXEy10pNxk3ZtmFDVg%3D%3D";
+        window.__genspark_locale = "en-US";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDqk2OlqNTxyXBpmoRKdrbmixINH3aoFKdP/Hc5zi46Wpq3CicexYHziOYOnyRodwMM3Zw3UHM1MbocQk6+Fuvb/iJC/ZrCO0iBrfIDqUJMWAJcevl/smusgxUh/l0ckU5a47Mawmb+ibN/WwQD1ze4B9ufVE7fVKdLlf6Y5igp2P2HsGh2oitKX1mTqd4Luoub4NscQbTD/8B2ogP+1TmBNK9emIvJ2PRKFXwARBu1+fUcofBMBNYuXdpF6h6vsXi+m90a3NbP6sttgsGceDuZkNfn7sdK0oRKlPO2J9IKw6RIISHjAT3SddxeOMqhClbjlKZfoD0+9u7b/ylcLcNUrxpPbj6otciNahcgrlMKtSXCdqJE40QE/b+EMVepUChDDVc4IBA8nZ66+e/cBCyHsDGIpZBkdhwmd0/KCQoP///3ABcQV4VRcDts6FPcinZ+DL2QoleFxkX2jZ+b6/Raxr4qCiTNrCJJ0Wqsgv2sqxyKROpXEy10pNxk3ZtmFDVg==";
+    </script>
+    
+        <script id="html_badge_script2" src="https://www.genspark.ai/html_badge.js"></script>
+        
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
